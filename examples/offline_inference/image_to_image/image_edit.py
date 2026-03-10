@@ -188,12 +188,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--height", type=int, default=1024, help="Height of generated image.")
     parser.add_argument("--width", type=int, default=1024, help="Width of generated image.")
     parser.add_argument(
-        "--num-images-per-prompt",
-        type=int,
-        default=1,
-        help="Number of images to generate for the given prompt.",
-    )
-    parser.add_argument(
         "--num-outputs-per-prompt",
         type=int,
         default=1,
@@ -582,6 +576,8 @@ def main():
             "multi_modal_data": {"image": input_image},
         },
         OmniDiffusionSamplingParams(
+            height=args.height,
+            width=args.width,
             generator=generator,
             true_cfg_scale=args.cfg_scale,
             guidance_scale=args.guidance_scale,
