@@ -185,8 +185,18 @@ def parse_args() -> argparse.Namespace:
         default="output_image_edit.png",
         help=("Path to save the edited image (PNG). Or prefix for Qwen-Image-Layered model save images(PNG)."),
     )
-    parser.add_argument("--height", type=int, default=1024, help="Height of generated image.")
-    parser.add_argument("--width", type=int, default=1024, help="Width of generated image.")
+    parser.add_argument(
+        "--height",
+        type=int,
+        default=None,
+        help="Height of generated image. If not set, the pipeline auto-sizes from the input image.",
+    )
+    parser.add_argument(
+        "--width",
+        type=int,
+        default=None,
+        help="Width of generated image. If not set, the pipeline auto-sizes from the input image.",
+    )
     parser.add_argument(
         "--num-outputs-per-prompt",
         type=int,
