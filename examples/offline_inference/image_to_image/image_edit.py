@@ -474,8 +474,6 @@ def main():
 
     generator = torch.Generator(device=current_omni_platform.device_type).manual_seed(args.seed)
 
-    use_nextstep = is_nextstep_model(args.model)
-
     parallel_config = DiffusionParallelConfig(
         ulysses_degree=args.ulysses_degree,
         ring_degree=args.ring_degree,
