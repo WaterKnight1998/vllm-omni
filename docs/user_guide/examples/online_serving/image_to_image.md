@@ -11,7 +11,7 @@ For **multi-image** input editing, use **Qwen-Image-Edit-2509** (QwenImageEditPl
 
 ## Start Server
 
-### Basic Start (Qwen-Image-Edit)
+### Basic Start
 
 ```bash
 vllm serve Qwen/Qwen-Image-Edit --omni --port 8092

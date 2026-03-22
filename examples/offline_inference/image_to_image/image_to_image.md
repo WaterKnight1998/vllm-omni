@@ -6,7 +6,7 @@ This example edits an input image using the `image_edit.py` CLI. Supported model
 
 ## Local CLI Usage
 
-### Single Image Editing (Qwen-Image-Edit)
+### Single Image Editing
 
 Download the example image:
 
