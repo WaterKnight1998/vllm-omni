@@ -332,6 +332,11 @@ def parse_args() -> argparse.Namespace:
         default=1,
         help="Number of ranks used for VAE patch/tile parallelism (decode/encode).",
     )
+    parser.add_argument(
+        "--enable-diffusion-pipeline-profiler",
+        action="store_true",
+        help="Enable diffusion pipeline profiler to display stage durations.",
+    )
     # NextStep-1.1 specific arguments
     parser.add_argument(
         "--guidance-scale-2",
@@ -445,6 +450,7 @@ def parse_args() -> argparse.Namespace:
         default=0.2,
         help="[tea_cache] Threshold for accumulated relative L1 distance.",
     )
+
     return parser.parse_args()
 
 
@@ -527,24 +533,23 @@ def main():
         quant_kwargs["quantization"] = args.quantization
 
     # Initialize Omni with appropriate pipeline
-    omni_kwargs = {
-        "model": args.model,
-        "enable_layerwise_offload": args.enable_layerwise_offload,
-        "vae_use_slicing": args.vae_use_slicing,
-        "vae_use_tiling": args.vae_use_tiling,
-        "cache_backend": args.cache_backend,
-        "cache_config": cache_config,
-        "enable_cache_dit_summary": args.enable_cache_dit_summary,
-        "parallel_config": parallel_config,
-        "enforce_eager": args.enforce_eager,
-        "enable_cpu_offload": args.enable_cpu_offload,
-        "log_stats": args.log_stats,
+
+    omni = Omni(
+        model=args.model,
+        enable_layerwise_offload=args.enable_layerwise_offload,
+        vae_use_slicing=args.vae_use_slicing,
+        vae_use_tiling=args.vae_use_tiling,
+        cache_backend=args.cache_backend,
+        cache_config=cache_config,
+        enable_cache_dit_summary=args.enable_cache_dit_summary,
+        parallel_config=parallel_config,
+        enforce_eager=args.enforce_eager,
+        enable_cpu_offload=args.enable_cpu_offload,
+        enable_diffusion_pipeline_profiler=args.enable_diffusion_pipeline_profiler,
+        log_stats: args.log_stats,
         **lora_args,
         **quant_kwargs,
-    }
-    if use_nextstep:
-        omni_kwargs["model_class_name"] = "NextStep11Pipeline"
-    omni = Omni(**omni_kwargs)
+    )
     print("Pipeline loaded")
 
     # Check if profiling is requested via environment variable
@@ -647,12 +652,12 @@ def main():
         raise ValueError("No output generated from omni.generate()")
 
     # Extract images from OmniRequestOutput
-    # omni.generate() returns list[OmniRequestOutput], extract images from request_output[0].images
+    # omni.generate() returns list[OmniRequestOutput], extract images from request_output.images
     first_output = outputs[0]
     if not hasattr(first_output, "request_output") or not first_output.request_output:
         raise ValueError("No request_output found in OmniRequestOutput")
 
-    req_out = first_output.request_output[0]
+    req_out = first_output.request_output
     if not isinstance(req_out, OmniRequestOutput) or not hasattr(req_out, "images"):
         raise ValueError("Invalid request_output structure or missing 'images' key")
 
